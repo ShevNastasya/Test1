@@ -1,0 +1,183 @@
+SELECT name FROM world
+WHERE name LIKE '%a%'
+AND name LIKE'%o%'
+AND name LIKE '%e%'
+AND name LIKE '%i%'
+AND name LIKE '%u%'
+AND name NOT LIKE '%\ %'
+
+
+SELECT winner, yr, subject
+FROM nobel 
+WHERE winner LIKE 'Sir%'
+ORDER BY yr DESC, winner ASC
+
+
+14
+
+SELECT Classes.class, Ships.name, Classes.country
+FROM Ships
+JOIN Classes 
+ON Classes.class = Ships.class
+AND numGuns IN
+(SELECT numGuns
+FROM Classes
+WHERE numGuns >= 10)
+
+
+29
+
+SELECT Income_o.point, Income_o.date, Income_o.inc, Outcome_o.out
+FROM Income_o
+LEFT JOIN Outcome_o
+ON Income_o.date=Outcome_o.date
+UNION 
+SELECT Income_o.point, Income_o.date, Income_o.inc, Outcome_o.out
+FROM Outcome_o 
+RIGHT JOIN Income_o
+ON Income_o.point=Outcome_o.point
+
+
+SELECT Income_o.point, Income_o.date, SUM(inc), SUM(out)
+FROM Income_o
+LEFT JOIN Outcome_o
+ON Income_o.point=Outcome_o.point
+AND (Income_o.date=Outcome_o.date)
+GROUP BY Income_o.point, Income_o.date
+UNION
+SELECT Outcome_o.point, Outcome_o.date, SUM(inc), SUM(out)
+FROM Outcome_o
+LEFT JOIN Income_o
+ON Income_o.point=Outcome_o.point
+AND (Income_o.date=Outcome_o.date)
+GROUP BY Outcome_o.point, Outcome_o.date
+
+30
+
+SELECT DISTINCT Income.point, Income.date, SUM(inc), SUM(out)
+FROM Income
+LEFT JOIN Outcome
+ON Income.point=Outcome.point
+AND (Income.date=Outcome.date)
+AND (Income.code=Outcome.code)
+GROUP BY Income.point, Income.date
+UNION
+SELECT DISTINCT Outcome.point, Outcome.date, SUM(inc), SUM(out)
+FROM Outcome
+LEFT JOIN Income
+ON Income.point=Outcome.point
+AND (Income.date=Outcome.date)
+AND (Income.code=Outcome.code)
+GROUP BY Outcome.point, Outcome.date
+
+
+
+SELECT DISTINCT point, date, SUM(inc) AS inc, SUM(out) AS out
+FROM (SELECT Income.point, Income.date, Income.inc, Outcome.out
+FROM Income
+LEFT JOIN Outcome
+ON Income.point=Outcome.point
+AND (Income.date=Outcome.date)
+AND Income.code=Outcome.code
+UNION
+SELECT DISTINCT Outcome.point, Outcome.date, Income.inc, Outcome.out
+FROM Outcome
+LEFT JOIN Income
+ON Income.point=Outcome.point
+AND (Income.date=Outcome.date)
+AND Income.code=Outcome.code)
+GROUP BY point,date
+
+35
+
+SELECT model,type
+FROM Product
+WHERE model LIKE '%[^A-Z]%'
+AND type LIKE '%[^0-9]%'
+
+
+SELECT model,type
+FROM Product
+WHERE model NOT LIKE '%[A-Z]%'
+AND type NOT LIKE '%[0-9]%'
+
+SELECT model,type
+FROM Product
+WHERE model NOT LIKE '%[A-Z]%' 
+AND model NOT LIKE '%[a-z]%' 
+AND type NOT LIKE '%[0-9]%'
+
+
+
+
+
+SELECT name, population
+FROM world
+WHERE population > (SELECT population
+FROM world
+WHERE name = 'Canada')
+AND population < (SELECT population
+FROM world
+WHERE name = 'Poland')
+
+
+SELECT mdate,  team1,
+  SUM(CASE WHEN teamid=team1 THEN 1 ELSE 0 END) score1,
+team2,
+  SUM(CASE WHEN teamid=team2 THEN 1 ELSE 0 END) score2
+FROM game left JOIN goal ON id=matchid
+GROUP BY id
+ORDER BY mdate, matchid, team1, team2
+
+
+13
+
+SELECT name
+FROM
+  movie JOIN casting ON movie.id=movieid
+        JOIN actor   ON actorid=actor.id
+WHERE ord=1
+GROUP BY actorid
+HAVING COUNT(ord) > 15
+ORDER BY name ASC
+
+14
+
+SELECT title, COUNT(actorid)
+FROM  movie 
+JOIN casting ON movie.id=movieid
+        JOIN actor   ON (actorid=actor.id)
+WHERE yr=1978
+GROUP BY title
+ORDER BY actorid, title  ASC
+
+15
+
+SELECT name
+FROM movie JOIN casting ON (movieid=movie.id
+                      AND ord != 'Art Garfunkel')
+           JOIN actor ON (actorid=actor.id)
+WHERE movie.id IN (SELECT movieid 
+FROM casting
+WHERE actorid IN (
+  SELECT id FROM actor
+  WHERE name= 'Art Garfunkel'))
+
+
+
+SELECT name
+FROM  movie 
+JOIN casting ON movie.id=movieid
+        JOIN actor   ON (actorid=actor.id)
+WHERE ord=1
+GROUP BY actor.name
+HAVING COUNT(ord) >= 15
+ORDER BY name ASC
+
+
+
+
+
+
+
+
