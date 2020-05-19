@@ -1,3 +1,5 @@
+My SQL queries
+
 SELECT name FROM world
 WHERE name LIKE '%a%'
 AND name LIKE'%o%'
